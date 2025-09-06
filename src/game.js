@@ -3,5 +3,6 @@ window.addEventListener("load", () => {
 });
 
 function initialize() {
+  GameImage.initialize();
   Stage.initialize();
 }
