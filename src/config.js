@@ -43,4 +43,6 @@ class Config {
   static playerLockDelayFrames = 20;
   /** プレイ中の下キー押下時の落下スピード */
   static playerDownSpeed = 10;
+  /** 左右移動に消費するフレーム数 */
+  static playerMoveFrames = 19;
 }

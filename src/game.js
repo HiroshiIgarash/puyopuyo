@@ -68,12 +68,17 @@ function gameLoop() {
       }
       break;
     case "playing":
-      const nextAction = Player.update();
+      const nextAction = Player.update(frame);
       gameState = nextAction;
       break;
     case "fix":
       Player.fixPlayerPuyo();
       gameState = "checkFallingPuyo";
+      break;
+    case "moving":
+      if (Player.movePlayerPuyo(frame)) {
+        gameState = "playing";
+      }
       break;
   }
 

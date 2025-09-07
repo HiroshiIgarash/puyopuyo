@@ -5,6 +5,9 @@ class Player {
   static centerPuyoElement = null;
   static rotatingPuyoElement = null;
   static keyStatus = null;
+  static actionStartFrame = 0;
+  static moveSource = 0;
+  static moveDestination = 0;
 
   static initialize() {
     Player.keyStatus = {
@@ -151,12 +154,63 @@ class Player {
   }
 
   /** イベントループで現在の状況を更新する */
-  static update() {
+  static update(frame) {
     if (Player.dropPlayerPuyo(Player.keyStatus.down)) {
       return "fix";
     }
     Player.setPlayerPuyoPosition();
+
+    if (Player.keyStatus.left || Player.keyStatus.right) {
+      const mx = Player.keyStatus.right ? 1 : -1;
+      const cx = Player.playerPuyoStatus.x;
+      const cy = Player.playerPuyoStatus.y;
+      const rx = cx + Player.playerPuyoStatus.dx;
+      const ry = cy + Player.playerPuyoStatus.dy;
+
+      let canMove = true;
+
+      if (Stage.getPuyoInfo(cx + mx, cy)) {
+        canMove = false;
+      }
+      if (Stage.getPuyoInfo(rx + mx, ry)) {
+        canMove = false;
+      }
+
+      if (Player.groundFrame === 0) {
+        if (Stage.getPuyoInfo(cx + mx, cy + 1)) {
+          canMove = false;
+        }
+        if (Stage.getPuyoInfo(rx + mx, ry + 1)) {
+          canMove = false;
+        }
+      }
+
+      if (canMove) {
+        Player.actionStartFrame = frame;
+        Player.moveSource = cx * Config.puyoImageWidth;
+        Player.moveDestination = (cx + mx) * Config.puyoImageWidth;
+        Player.playerPuyoStatus.x += mx;
+        return "moving";
+      }
+    }
     return "playing";
+  }
+
+  /** ぷよを左右に移動させる */
+  static movePlayerPuyo(frame) {
+    Player.dropPlayerPuyo(false);
+
+    let ratio = (frame - Player.actionStartFrame) / Config.playerMoveFrames;
+    if (ratio > 1) {
+      ratio = 1;
+    }
+    Player.playerPuyoStatus.left =
+      Player.moveSource + (Player.moveDestination - Player.moveSource) * ratio;
+    Player.setPlayerPuyoPosition();
+    if (ratio === 1) {
+      return true;
+    }
+    return false;
   }
 
   /** 現在のプレイヤー操作ぷよをぷよぷよ盤の上に配置する */
