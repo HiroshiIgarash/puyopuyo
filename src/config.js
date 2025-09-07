@@ -12,6 +12,8 @@ class Config {
   static stageBackgroundColor = "#11213b";
   /** ネクスト表示の背景色 */
   static nextBackgroundColor = "#e2a9c8";
+  /** スコアの背景色 */
+  static scoreBackgroundColor = "#24c0bb";
 
   // 初期状態のステージ
   static initialBoard = [
@@ -49,4 +51,17 @@ class Config {
   static playerMoveFrames = 19;
   /** 回転に消費するフレーム数 */
   static playerRotateFrames = 19;
+  /** スコアのフォントの高さ */
+  static scoreHeight = 33;
+  /** 連鎖ボーナステーブル */
+  static comboBonusTable = [
+    0, 0, 8, 16, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416,
+    448, 480, 512, 544, 576, 608, 640, 672,
+  ];
+  /** 連結ボーナステーブル */
+  static pieceBonusTable = [0, 0, 0, 0, 0, 2, 3, 4, 5, 6, 7, 10];
+  /** 色数ボーナステーブル */
+  static colorBonusTable = [0, 0, 3, 6, 12, 24];
+  /** 全消し時のボーナス */
+  static zenkeshiBonus = 3600;
 }

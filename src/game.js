@@ -8,6 +8,7 @@ function initialize() {
   GameImage.initialize();
   Stage.initialize();
   Player.initialize();
+  Score.initialize();
 
   gameState = "start";
   frame = 0;
@@ -46,10 +47,12 @@ function gameLoop() {
       if (eraseInfo) {
         comboCount++;
         gameState = "erasingPuyo";
+        Score.addComboScore(comboCount, eraseInfo.piece, eraseInfo.color);
         Stage.hideZenkeshi();
       } else {
         if (Stage.puyoCount === 0 && comboCount > 0) {
           Stage.showZenkeshi(frame);
+          Score.addScore(Config.zenkeshiBonus);
         }
         comboCount = 0;
         gameState = "createPlayerPuyo";

@@ -125,6 +125,9 @@ class Player {
       ) {
         y += 1;
         Player.playerPuyoStatus.y = y;
+        if (Player.keyStatus.down) {
+          Score.addScore(1);
+        }
         if (
           !Stage.getPuyoInfo(x, y + 1) &&
           !Stage.getPuyoInfo(x + dx, y + dy + 1)

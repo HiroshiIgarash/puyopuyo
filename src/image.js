@@ -1,5 +1,6 @@
 class GameImage {
   static puyoImageList = null;
+  static digitImageList = null;
 
   static initialize() {
     GameImage.puyoImageList = [];
@@ -11,6 +12,15 @@ class GameImage {
       img.style.position = "absolute";
       GameImage.puyoImageList[i] = img;
     }
+
+    GameImage.digitImageList = [];
+    for (let i = 0; i < 10; i++) {
+      const img = document.getElementById(`font_${i}`);
+      const width = (img.width / img.height) * Config.scoreHeight;
+      img.width = width;
+      img.height = Config.scoreHeight;
+      GameImage.digitImageList[i] = img;
+    }
   }
 
   /**
@@ -20,5 +30,14 @@ class GameImage {
   static getPuyoImage(color) {
     const image = GameImage.puyoImageList[color - 1].cloneNode(true);
     return image;
+  }
+
+  static getDigitImage(digit) {
+    const image = GameImage.digitImageList[digit].cloneNode(true);
+    return image;
+  }
+
+  static getDigitImageWidth() {
+    return GameImage.digitImageList[0].width;
   }
 }
