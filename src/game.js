@@ -1,6 +1,12 @@
 window.addEventListener("load", () => {
   initialize();
 
+  // 画面の高さに合わせて拡大する
+  const scale =
+    window.innerHeight /
+    (Score.scoreElement.offsetTop + Score.scoreElement.offsetHeight);
+  document.body.style.transform = `scale(${scale})`;
+
   gameLoop();
 });
 

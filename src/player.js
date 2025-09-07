@@ -38,26 +38,65 @@ class Player {
           event.preventDefault();
           break;
       }
-      window.addEventListener("keyup", (event) => {
-        switch (event.key) {
-          case "ArrowLeft":
-            Player.keyStatus.left = false;
-            event.preventDefault();
-            break;
-          case "ArrowRight":
-            Player.keyStatus.right = false;
-            event.preventDefault();
-            break;
-          case "ArrowDown":
-            Player.keyStatus.down = false;
-            event.preventDefault();
-            break;
-          case "ArrowUp":
-            Player.keyStatus.up = false;
-            event.preventDefault();
-            break;
+    });
+    window.addEventListener("keyup", (event) => {
+      switch (event.key) {
+        case "ArrowLeft":
+          Player.keyStatus.left = false;
+          event.preventDefault();
+          break;
+        case "ArrowRight":
+          Player.keyStatus.right = false;
+          event.preventDefault();
+          break;
+        case "ArrowDown":
+          Player.keyStatus.down = false;
+          event.preventDefault();
+          break;
+        case "ArrowUp":
+          Player.keyStatus.up = false;
+          event.preventDefault();
+          break;
+      }
+    });
+
+    let pageX = 0,
+      pageY = 0;
+    document.addEventListener("touchstart", (event) => {
+      const touch = event.touches[0];
+      pageX = touch.pageX;
+      pageY = touch.pageY;
+    });
+    document.addEventListener("touchmove", (event) => {
+      let { left, right, up, down } = Player.keyStatus;
+      if (left || right || up || down) {
+        return;
+      }
+
+      const touch = event.touches[0];
+      const dx = touch.pageX - pageX;
+      const dy = touch.pageY - pageY;
+      if (dx ** 2 + dy ** 2 < 5 ** 2) {
+        return;
+      }
+      if (Math.abs(dx) > Math.abs(dy)) {
+        if (dx > 0) {
+          right = true;
+        } else {
+          left = true;
         }
-      });
+      } else {
+        if (dy > 0) {
+          down = true;
+        } else {
+          up = true;
+        }
+      }
+      Player.keyStatus = { left, right, up, down };
+    });
+
+    document.addEventListener("touchend", (event) => {
+      Player.keyStatus = { left: false, right: false, up: false, down: false };
     });
   }
 
