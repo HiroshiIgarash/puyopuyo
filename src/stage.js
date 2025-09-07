@@ -21,6 +21,9 @@ class Stage {
   static erasingStartFrame = 0;
   static erasingInfoList = [];
   static zenkeshiImage = null;
+  static nextElement = null;
+  static nextPuyoColors = [];
+  static nextPuyoElements = [];
 
   static initialize() {
     Stage.stageElement = document.getElementById("stage");
@@ -31,6 +34,29 @@ class Stage {
       Config.stageRows * Config.puyoImageHeight
     }px`;
     Stage.stageElement.style.backgroundColor = Config.stageBackgroundColor;
+
+    const nextContainerElement = document.getElementById("next");
+    nextContainerElement.style.width = `${
+      Config.stageCols * Config.puyoImageWidth
+    }px`;
+    nextContainerElement.style.height = `${2.2 * Config.puyoImageHeight}px`;
+    nextContainerElement.style.backgroundColor = Config.nextBackgroundColor;
+
+    const borderWidth = 2;
+    Stage.nextElement = document.createElement("div");
+    Stage.nextElement.style.position = "absolute";
+    Stage.nextElement.style.left = `${
+      (Config.puyoImageWidth * (Config.stageCols - 1)) / 2 - borderWidth
+    }px`;
+    Stage.nextElement.style.top = `${
+      Config.puyoImageHeight * 0.1 - borderWidth
+    }px`;
+    Stage.nextElement.style.width = `${Config.puyoImageWidth * 1}px`;
+    Stage.nextElement.style.height = `${Config.puyoImageHeight * 2}px`;
+    Stage.nextElement.style.border = `${borderWidth}px solid #ff8`;
+    Stage.nextElement.style.borderRadius = `${Config.puyoImageWidth * 0.2}px`;
+    Stage.nextElement.style.backgroundColor = "rgba(0,0,0,0.5)";
+    nextContainerElement.appendChild(Stage.nextElement);
 
     // 全消しの画像を用意
     Stage.zenkeshiImage = document.getElementById("zenkeshi");
@@ -62,6 +88,39 @@ class Stage {
         }
       }
     }
+
+    Stage.nextPuyoColors = [];
+    Stage.nextPuyoElements = [];
+    Stage.getNextPuyoColors();
+  }
+
+  /** 現在のネクストぷよを返し、新しいネクストぷよを作成ならびに画面上に表示する */
+  static getNextPuyoColors() {
+    const ret = Stage.nextPuyoColors;
+
+    const nextCenterPuyoColor =
+      Math.trunc(Math.random() * Config.puyoColorMax) + 1;
+    const nextRotatingPuyoColor =
+      Math.trunc(Math.random() * Config.puyoColorMax) + 1;
+    Stage.nextPuyoColors = [nextCenterPuyoColor, nextRotatingPuyoColor];
+    if (ret.length) {
+      for (const element of Stage.nextPuyoElements) {
+        element.remove();
+      }
+      const nextCenterPuyoElement = GameImage.getPuyoImage(nextCenterPuyoColor);
+      const nextRotatingPuyoElement = GameImage.getPuyoImage(
+        nextRotatingPuyoColor
+      );
+      nextCenterPuyoElement.style.top = `${Config.puyoImageHeight}px`;
+      console.log(nextCenterPuyoElement);
+      console.log(nextRotatingPuyoElement);
+      Stage.nextElement.append(nextRotatingPuyoElement, nextCenterPuyoElement);
+
+      console.log(Stage.nextElement.children);
+      Stage.nextPuyoElements = [nextCenterPuyoElement, nextRotatingPuyoElement];
+    }
+
+    return ret;
   }
 
   /** ぷよを新しく作って、画面上とぷよぷよ盤の両方にセットする */

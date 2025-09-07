@@ -65,10 +65,9 @@ class Player {
   static createPlayerPuyo() {
     if (Stage.getPuyoInfo(2, 0)) return false;
 
-    Player.centerPuyoColor =
-      Math.trunc(Math.random() * Config.puyoColorMax) + 1;
-    Player.rotatingPuyoColor =
-      Math.trunc(Math.random() * Config.puyoColorMax) + 1;
+    const nextPuyoColors = Stage.getNextPuyoColors();
+    Player.centerPuyoColor = nextPuyoColors[0];
+    Player.rotatingPuyoColor = nextPuyoColors[1];
 
     Player.centerPuyoElement = GameImage.getPuyoImage(Player.centerPuyoColor);
     Player.rotatingPuyoElement = GameImage.getPuyoImage(

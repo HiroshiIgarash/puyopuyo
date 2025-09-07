@@ -10,6 +10,8 @@ class Config {
   static stageRows = 12;
   /** ステージの背景色 */
   static stageBackgroundColor = "#11213b";
+  /** ネクスト表示の背景色 */
+  static nextBackgroundColor = "#e2a9c8";
 
   // 初期状態のステージ
   static initialBoard = [
