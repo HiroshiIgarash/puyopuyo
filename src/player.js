@@ -8,6 +8,9 @@ class Player {
   static actionStartFrame = 0;
   static moveSource = 0;
   static moveDestination = 0;
+  static rotateBeforeLeft = 0;
+  static rotateAfterTop = 0;
+  static rotateFromRotation = 0;
 
   static initialize() {
     Player.keyStatus = {
@@ -192,6 +195,69 @@ class Player {
         Player.playerPuyoStatus.x += mx;
         return "moving";
       }
+    } else if (Player.keyStatus.up) {
+      const x = Player.playerPuyoStatus.x;
+      const y =
+        Player.playerPuyoStatus.y +
+        (Player.playerPuyoStatus.groundFrame === 0 ? 1 : 0);
+      const rotation = Player.playerPuyoStatus.rotation;
+      let canRotate = true;
+
+      let cx = 0;
+      let cy = 0;
+      if (rotation === 0) {
+        // do nothing
+      } else if (rotation === 90) {
+        if (Stage.getPuyoInfo(x - 1, y)) {
+          cx = 1;
+          if (Stage.getPuyoInfo(x + 1, y)) {
+            canRotate = false;
+          }
+        }
+      } else if (rotation === 180) {
+        if (Stage.getPuyoInfo(x, y + 1)) {
+          cy = -1;
+        }
+        if (Stage.getPuyoInfo(x - 1, y + 1)) {
+          cy = -1;
+        }
+      } else if (rotation === 270) {
+        if (Stage.getPuyoInfo(x + 1, y)) {
+          cx = -1;
+          if (Stage.getPuyoInfo(x - 1, y)) {
+            canRotate = false;
+          }
+        }
+      }
+
+      if (canRotate) {
+        if (cy === -1) {
+          if (Stage.groundFrame > 0) {
+            Player.playerPuyoStatus.y -= 1;
+            Player.groundFrame = 0;
+          }
+          Player.playerPuyoStatus.top =
+            Player.playerPuyoStatus.y * Config.puyoImageHeight;
+        }
+
+        Player.actionStartFrame = frame;
+        Player.rotateBeforeLeft = x * Config.puyoImageHeight;
+        Player.rotateAfterTop = (x + cx) * Config.puyoImageHeight;
+        Player.rotateFromRotation = Player.playerPuyoStatus.rotation;
+
+        Player.playerPuyoStatus.x += cx;
+        const nextRotation = (Player.playerPuyoStatus.rotation + 90) % 360;
+        console.log(Player.playerPuyoStatus.rotation);
+        const dCombi = [
+          [1, 0],
+          [0, -1],
+          [-1, 0],
+          [0, 1],
+        ][nextRotation / 90];
+        Player.playerPuyoStatus.dx = dCombi[0];
+        Player.playerPuyoStatus.dy = dCombi[1];
+        return "rotating";
+      }
     }
     return "playing";
   }
@@ -206,6 +272,26 @@ class Player {
     }
     Player.playerPuyoStatus.left =
       Player.moveSource + (Player.moveDestination - Player.moveSource) * ratio;
+    Player.setPlayerPuyoPosition();
+    if (ratio === 1) {
+      return true;
+    }
+    return false;
+  }
+
+  /** ぷよを回転させる */
+  static rotatePlayerPuyo(frame) {
+    Player.dropPlayerPuyo(false);
+
+    let ratio = (frame - Player.actionStartFrame) / Config.playerRotateFrames;
+    if (ratio > 1) {
+      ratio = 1;
+    }
+    Player.playerPuyoStatus.left =
+      Player.rotateBeforeLeft +
+      (Player.rotateAfterTop - Player.rotateBeforeLeft) * ratio;
+    Player.playerPuyoStatus.rotation =
+      (Player.rotateFromRotation + 90 * ratio) % 360;
     Player.setPlayerPuyoPosition();
     if (ratio === 1) {
       return true;

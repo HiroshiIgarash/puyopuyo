@@ -45,4 +45,6 @@ class Config {
   static playerDownSpeed = 10;
   /** 左右移動に消費するフレーム数 */
   static playerMoveFrames = 19;
+  /** 回転に消費するフレーム数 */
+  static playerRotateFrames = 19;
 }

@@ -80,6 +80,11 @@ function gameLoop() {
         gameState = "playing";
       }
       break;
+    case "rotating":
+      if (Player.rotatePlayerPuyo(frame)) {
+        gameState = "playing";
+      }
+      break;
   }
 
   frame++;
