@@ -86,7 +86,7 @@ class Stage {
 
   /** ぷよぷよ盤の情報を返す */
   static getPuyoInfo(x, y) {
-    // 左右、もしくはそこの場合はダミーのぷよ情報を返す
+    // 左右、もしくは底の場合はダミーのぷよ情報を返す
     if (x < 0 || x >= Config.stageCols || y >= Config.stageRows) {
       return { puyoColor: -1 };
     }

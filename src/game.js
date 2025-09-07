@@ -14,7 +14,7 @@ function initialize() {
 
 /**
  * ゲームの現在の状況
- * @type {"start" | "checkfFallingPuyo" | "fallingPuyo" | "checkPuyoErase" | "PuyoErase" | ""}
+ * @type {"start" | "checkFallingPuyo" | "fallingPuyo" | "checkPuyoErase" | "erasingPuyo" | "createPlayerPuyo" | "gameOver" | "playing" | "fix"}
  */
 let gameState;
 /** ゲームの現在のフレーム（1/60秒ごとに1追加される） */
@@ -44,20 +44,35 @@ function gameLoop() {
       const eraseInfo = Stage.checkPuyoErase(frame);
       if (eraseInfo) {
         comboCount++;
-        gameState = "PuyoErase";
+        gameState = "erasingPuyo";
         Stage.hideZenkeshi();
       } else {
         if (Stage.puyoCount === 0 && comboCount > 0) {
           Stage.showZenkeshi(frame);
         }
         comboCount = 0;
-        gameState = "";
+        gameState = "createPlayerPuyo";
       }
       break;
-    case "PuyoErase":
+    case "erasingPuyo":
       if (!Stage.erasePuyo(frame)) {
         gameState = "checkFallingPuyo";
       }
+      break;
+    case "createPlayerPuyo":
+      if (!Player.createPlayerPuyo()) {
+        gameState = "gameOver";
+      } else {
+        gameState = "playing";
+      }
+      break;
+    case "playing":
+      const nextAction = Player.update();
+      gameState = nextAction;
+      break;
+    case "fix":
+      Player.fixPlayerPuyo();
+      gameState = "checkFallingPuyo";
       break;
   }
 
