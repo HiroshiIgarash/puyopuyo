@@ -18,6 +18,8 @@ class Stage {
   static puyoCount = 0;
   /** @type {Array<FallingPuyoInfo>} */
   static fallingPuyoInfoList = [];
+  static erasingStartFrame = 0;
+  static erasingInfoList = [];
 
   static initialize() {
     Stage.stageElement = document.getElementById("stage");
@@ -145,5 +147,108 @@ class Stage {
       fallingPuyoInfo.element.style.top = `${position}px`;
     }
     return isFalling;
+  }
+
+  /** 消せるかどうか判定する */
+  static checkPuyoErase(startFrame) {
+    Stage.erasingStartFrame = startFrame;
+    Stage.erasingInfoList = [];
+
+    const erasedPuyoColorBin = {};
+
+    const checkConnectedPuyo = (x, y, connectedInfoList = []) => {
+      const originalPuyoInfo = Stage.getPuyoInfo(x, y);
+      if (!originalPuyoInfo) return connectedInfoList;
+      connectedInfoList.push({ x, y, puyoInfo: originalPuyoInfo });
+      Stage.removePuyo(x, y);
+
+      const directions = [
+        [0, 1],
+        [1, 0],
+        [0, -1],
+        [-1, 0],
+      ];
+
+      for (const direction of directions) {
+        const dx = x + direction[0];
+        const dy = y + direction[1];
+        const puyoInfo = Stage.getPuyoInfo(dx, dy);
+        if (!puyoInfo || puyoInfo.puyoColor !== originalPuyoInfo.puyoColor) {
+          continue;
+        }
+        checkConnectedPuyo(dx, dy, connectedInfoList);
+      }
+      return connectedInfoList;
+    };
+
+    const remainingPuyoList = [];
+    for (let y = 0; y < Config.stageRows; y++) {
+      for (let x = 0; x < Config.stageCols; x++) {
+        const puyoInfo = Stage.getPuyoInfo(x, y);
+        const connectedInfoList = checkConnectedPuyo(x, y);
+        if (connectedInfoList.length < Config.erasePuyoCount) {
+          if (connectedInfoList.length) {
+            remainingPuyoList.push(...connectedInfoList);
+          }
+        } else {
+          if (connectedInfoList) {
+            Stage.erasingInfoList.push(...connectedInfoList);
+            erasedPuyoColorBin[puyoInfo.puyoColor] = true;
+          }
+        }
+      }
+    }
+
+    Stage.puyoCount -= Stage.erasingInfoList.length;
+
+    for (const info of remainingPuyoList) {
+      Stage.setPuyoInfo(info.x, info.y, info.puyoInfo);
+    }
+
+    if (Stage.erasingInfoList.length) {
+      return {
+        piece: Stage.erasingInfoList.length,
+        color: Object.keys(erasedPuyoColorBin).length,
+      };
+    }
+    return null;
+  }
+
+  static erasePuyo(frame) {
+    const elapsedFrames = frame - Stage.erasingStartFrame;
+    const ratio = elapsedFrames / Config.eraseAnimationFrames;
+
+    let element;
+    if (ratio >= 1) {
+      for (const info of Stage.erasingInfoList) {
+        element = info.puyoInfo.element;
+        Stage.stageElement.removeChild(element);
+      }
+      return false;
+    } else if (ratio >= 0.75) {
+      for (const info of Stage.erasingInfoList) {
+        element = info.puyoInfo.element;
+        element.style.display = "block";
+      }
+      return true;
+    } else if (ratio >= 0.5) {
+      for (const info of Stage.erasingInfoList) {
+        element = info.puyoInfo.element;
+        element.style.display = "none";
+      }
+      return true;
+    } else if (ratio >= 0.25) {
+      for (const info of Stage.erasingInfoList) {
+        element = info.puyoInfo.element;
+        element.style.display = "block";
+      }
+      return true;
+    } else {
+      for (const info of Stage.erasingInfoList) {
+        element = info.puyoInfo.element;
+        element.style.display = "none";
+      }
+      return true;
+    }
   }
 }
