@@ -1,8 +1,23 @@
+/**
+ * @typedef {Object} PuyoInfo
+ * @property {number} puyoColor
+ * @property {HTMLImageElement} element
+ */
+
+/**
+ * @typedef {Object} FallingPuyoInfo
+ * @property {HTMLImageElement} element
+ * @property {number} position
+ * @property {number} destination
+ * @property {boolean} falling
+ */
 class Stage {
   static stageElement = null;
-  /** @type {Array<Array<{ puyoColor: number, element: HTMLImageElement } | null>>} */
+  /** @type {Array<Array<PuyoInfo|null>>} */
   static puyoBoard = null;
   static puyoCount = 0;
+  /** @type {Array<FallingPuyoInfo>} */
+  static fallingPuyoInfoList = [];
 
   static initialize() {
     Stage.stageElement = document.getElementById("stage");
@@ -52,5 +67,83 @@ class Stage {
     };
 
     Stage.puyoCount++;
+  }
+
+  /** ぷよぷよ盤にぷよ情報をセットする */
+  static setPuyoInfo(x, y, info) {
+    Stage.puyoBoard[y][x] = info;
+  }
+
+  /** ぷよぷよ盤の情報を返す */
+  static getPuyoInfo(x, y) {
+    // 左右、もしくはそこの場合はダミーのぷよ情報を返す
+    if (x < 0 || x >= Config.stageCols || y >= Config.stageRows) {
+      return { puyoColor: -1 };
+    }
+    // y座標がマイナスの場合は、そこは空白扱いにする
+    if (y < 0) return null;
+
+    // それ以外の場合は、ぷよぷよ盤の情報をそのまま返す
+    return Stage.puyoBoard[y][x];
+  }
+
+  /** ぷよぷよ盤からぷよ情報を消す */
+  static removePuyo(x, y) {
+    Stage.puyoBoard[y][x] = null;
+  }
+
+  /** 自由落下するぷよがあるかどうかをチェックする */
+  static checkFallingPuyo() {
+    Stage.fallingPuyoInfoList = [];
+
+    for (let y = Config.stageRows - 2; y >= 0; y--) {
+      for (let x = 0; x < Config.stageCols; x++) {
+        const currentPuyoInfo = Stage.getPuyoInfo(x, y);
+
+        if (!currentPuyoInfo) continue;
+
+        const belowPuyoInfo = Stage.getPuyoInfo(x, y + 1);
+
+        if (!belowPuyoInfo) {
+          Stage.removePuyo(x, y);
+          let destination = y;
+          while (!Stage.getPuyoInfo(x, destination + 1)) {
+            destination++;
+          }
+          Stage.setPuyoInfo(x, destination, currentPuyoInfo);
+          Stage.fallingPuyoInfoList.push({
+            element: currentPuyoInfo.element,
+            position: y * Config.puyoImageHeight,
+            destination: destination * Config.puyoImageHeight,
+            falling: true,
+          });
+        }
+      }
+    }
+    return Stage.fallingPuyoInfoList.length > 0;
+  }
+
+  /** 自由落下させる */
+  static fallPuyo() {
+    let isFalling = false;
+    for (const fallingPuyoInfo of Stage.fallingPuyoInfoList) {
+      if (!fallingPuyoInfo.falling) {
+        continue;
+      }
+
+      let position = fallingPuyoInfo.position;
+      position += Config.fallingSpeed;
+
+      if (position >= fallingPuyoInfo.destination) {
+        position = fallingPuyoInfo.destination;
+        fallingPuyoInfo.falling = false;
+      } else {
+        isFalling = true;
+      }
+
+      fallingPuyoInfo.position = position;
+      fallingPuyoInfo.element.style.top = `${position}px`;
+    }
+    return isFalling;
   }
 }
