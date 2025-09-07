@@ -16,7 +16,7 @@ function initialize() {
 
 /**
  * ゲームの現在の状況
- * @type {"start" | "checkFallingPuyo" | "fallingPuyo" | "checkPuyoErase" | "erasingPuyo" | "createPlayerPuyo" | "gameOver" | "playing" | "fix"}
+ * @type {"start" | "checkFallingPuyo" | "fallingPuyo" | "checkPuyoErase" | "erasingPuyo" | "createPlayerPuyo" | "gameOver" | "playing" | "fix" | "moving" | "rotating" | "batankyu"}
  */
 let gameState;
 /** ゲームの現在のフレーム（1/60秒ごとに1追加される） */
@@ -87,6 +87,13 @@ function gameLoop() {
       if (Player.rotatePlayerPuyo(frame)) {
         gameState = "playing";
       }
+      break;
+    case "gameOver":
+      GameImage.prepareBatankyuAnimation(frame);
+      gameState = "batankyu";
+      break;
+    case "batankyu":
+      GameImage.updateBatankyu(frame);
       break;
   }
 

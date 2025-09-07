@@ -1,6 +1,8 @@
 class GameImage {
   static puyoImageList = null;
   static digitImageList = null;
+  static batankyuImage = null;
+  static GameOverFrame = 0;
 
   static initialize() {
     GameImage.puyoImageList = [];
@@ -21,6 +23,10 @@ class GameImage {
       img.height = Config.scoreHeight;
       GameImage.digitImageList[i] = img;
     }
+
+    GameImage.batankyuImage = document.getElementById("batankyu");
+    GameImage.batankyuImage.width = Config.puyoImageWidth * Config.stageCols;
+    GameImage.batankyuImage.style.position = "absolute";
   }
 
   /**
@@ -39,5 +45,21 @@ class GameImage {
 
   static getDigitImageWidth() {
     return GameImage.digitImageList[0].width;
+  }
+
+  static prepareBatankyuAnimation(frame) {
+    GameImage.GameOverFrame = frame;
+    Stage.stageElement.appendChild(GameImage.batankyuImage);
+    GameImage.updateBatankyu(frame);
+  }
+
+  static updateBatankyu(frame) {
+    const ratio =
+      (frame - GameImage.GameOverFrame) / Config.batankyuAnimationFrames;
+    const height = Config.puyoImageHeight * Config.stageRows;
+    const x = Math.sin(ratio * Math.PI * 2 * 5) * Config.puyoImageWidth;
+    const y = (-Math.cos(ratio * Math.PI * 2) * height) / 4 + height / 2;
+    GameImage.batankyuImage.style.left = `${x}px`;
+    GameImage.batankyuImage.style.top = `${y}px`;
   }
 }

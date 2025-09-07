@@ -64,4 +64,6 @@ class Config {
   static colorBonusTable = [0, 0, 3, 6, 12, 24];
   /** 全消し時のボーナス */
   static zenkeshiBonus = 3600;
+  /** ばたんきゅ〜アニメーションのフレーム数 */
+  static batankyuAnimationFrames = 1000;
 }
