@@ -7,6 +7,7 @@ window.addEventListener("load", () => {
 function initialize() {
   GameImage.initialize();
   Stage.initialize();
+  Player.initialize();
 
   gameState = "start";
   frame = 0;

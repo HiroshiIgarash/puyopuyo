@@ -41,4 +41,6 @@ class Config {
   static playerFallingSpeed = 0.9;
   /** 何フレーム設置したらぷよが固定されるか */
   static playerLockDelayFrames = 20;
+  /** プレイ中の下キー押下時の落下スピード */
+  static playerDownSpeed = 10;
 }

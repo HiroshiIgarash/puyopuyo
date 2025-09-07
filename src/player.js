@@ -4,6 +4,56 @@ class Player {
   static playerPuyoStatus = null;
   static centerPuyoElement = null;
   static rotatingPuyoElement = null;
+  static keyStatus = null;
+
+  static initialize() {
+    Player.keyStatus = {
+      left: false,
+      right: false,
+      down: false,
+      up: false,
+    };
+    window.addEventListener("keydown", (event) => {
+      switch (event.key) {
+        case "ArrowLeft":
+          Player.keyStatus.left = true;
+          event.preventDefault();
+          break;
+        case "ArrowRight":
+          Player.keyStatus.right = true;
+          event.preventDefault();
+          break;
+        case "ArrowDown":
+          Player.keyStatus.down = true;
+          event.preventDefault();
+          break;
+        case "ArrowUp":
+          Player.keyStatus.up = true;
+          event.preventDefault();
+          break;
+      }
+      window.addEventListener("keyup", (event) => {
+        switch (event.key) {
+          case "ArrowLeft":
+            Player.keyStatus.left = false;
+            event.preventDefault();
+            break;
+          case "ArrowRight":
+            Player.keyStatus.right = false;
+            event.preventDefault();
+            break;
+          case "ArrowDown":
+            Player.keyStatus.down = false;
+            event.preventDefault();
+            break;
+          case "ArrowUp":
+            Player.keyStatus.up = false;
+            event.preventDefault();
+            break;
+        }
+      });
+    });
+  }
 
   /** プレイヤーが操作するぷよを作る */
   static createPlayerPuyo() {
@@ -54,7 +104,7 @@ class Player {
   }
 
   /** プレイヤーの操作ぷよを落下させる */
-  static dropPlayerPuyo() {
+  static dropPlayerPuyo(isPressingDown) {
     let { x, y, dx, dy } = Player.playerPuyoStatus;
 
     if (
@@ -62,6 +112,9 @@ class Player {
       !Stage.getPuyoInfo(x + dx, y + dy + 1)
     ) {
       Player.playerPuyoStatus.top += Config.playerFallingSpeed;
+      if (isPressingDown) {
+        Player.playerPuyoStatus.top += Config.playerDownSpeed;
+      }
       if (
         Math.floor(Player.playerPuyoStatus.top / Config.puyoImageHeight) !== y
       ) {
@@ -99,7 +152,7 @@ class Player {
 
   /** イベントループで現在の状況を更新する */
   static update() {
-    if (Player.dropPlayerPuyo()) {
+    if (Player.dropPlayerPuyo(Player.keyStatus.down)) {
       return "fix";
     }
     Player.setPlayerPuyoPosition();
