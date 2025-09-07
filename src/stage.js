@@ -20,6 +20,7 @@ class Stage {
   static fallingPuyoInfoList = [];
   static erasingStartFrame = 0;
   static erasingInfoList = [];
+  static zenkeshiImage = null;
 
   static initialize() {
     Stage.stageElement = document.getElementById("stage");
@@ -30,6 +31,13 @@ class Stage {
       Config.stageRows * Config.puyoImageHeight
     }px`;
     Stage.stageElement.style.backgroundColor = Config.stageBackgroundColor;
+
+    // 全消しの画像を用意
+    Stage.zenkeshiImage = document.getElementById("zenkeshi");
+    Stage.zenkeshiImage.width = Config.stageCols * Config.puyoImageWidth;
+    Stage.zenkeshiImage.style.opacity = 0;
+    Stage.zenkeshiImage.style.position = "absolute";
+    Stage.stageElement.appendChild(Stage.zenkeshiImage);
 
     // ぷよぷよ盤を初期化
     Stage.puyoCount = 0;
@@ -250,5 +258,26 @@ class Stage {
       }
       return true;
     }
+  }
+
+  /** 全消しの表示を開始する */
+  static showZenkeshi() {
+    Stage.zenkeshiImage.style.transition = "none";
+    Stage.zenkeshiImage.style.opacity = 1;
+    Stage.zenkeshiImage.style.top = `${
+      Config.puyoImageHeight * Config.stageRows
+    }px`;
+    Stage.zenkeshiImage.offsetHeight;
+
+    Stage.zenkeshiImage.style.transition = `top ${Config.zenkeshiDuration}ms linear`;
+    Stage.zenkeshiImage.style.top = `${
+      (Config.puyoImageHeight * Config.stageRows) / 3
+    }px`;
+  }
+
+  /** 全消しの画像を画面上から消す */
+  static hideZenkeshi() {
+    Stage.zenkeshiImage.style.transition = `opacity ${Config.zenkeshiDuration}ms linear`;
+    Stage.zenkeshiImage.style.opacity = 0;
   }
 }

@@ -45,7 +45,11 @@ function gameLoop() {
       if (eraseInfo) {
         comboCount++;
         gameState = "PuyoErase";
+        Stage.hideZenkeshi();
       } else {
+        if (Stage.puyoCount === 0 && comboCount > 0) {
+          Stage.showZenkeshi(frame);
+        }
         comboCount = 0;
         gameState = "";
       }
